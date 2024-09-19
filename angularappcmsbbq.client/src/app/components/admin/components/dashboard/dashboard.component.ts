@@ -12,7 +12,6 @@ import { RejestratorLogowaniaHandlerService } from '../../../../services/rejestr
 import { RejestratorLogowania } from '../../../../models/rejestratorLogowania';
 import { GuidGenerator } from '../../../../services/guid-generator';
 import { Guid } from 'guid-typescript';
-import { LocalStorageSessionService } from '../../../../services/local-storage-session.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,7 +36,6 @@ export class DashboardComponent implements OnInit {
     private fb: FormBuilder,
     public accountHandlerService: AccountHandlerService,
     public roleService: RolesHandlerService,
-    //private localStorageSessionService: LocalStorageSessionService,
     private router: Router,
     private snackBarService: SnackBarService,
     public accountService: AccountService,
@@ -72,7 +70,7 @@ export class DashboardComponent implements OnInit {
     this.formGroupLogin.markAllAsTouched();
     this.formGroupRegister.markAllAsTouched();
 
-/*
+
     let sessionModel = localStorage.getItem('sessionModel');
     if (sessionModel) {
       let sm = JSON.parse(sessionModel);
@@ -80,7 +78,7 @@ export class DashboardComponent implements OnInit {
       this.isLoggedIn = sm.isLoggedIn;
       this.role = sm.role;
     }
-*/
+
   }
 
   toggleSidenav(): void {
@@ -129,12 +127,11 @@ export class DashboardComponent implements OnInit {
             //dataWylogowania: result.model.dataWylogowania
           };             
           localStorage.setItem('sessionModel', JSON.stringify(sessionModel));
-          //this.localStorageSessionService.setItemSession('sessionModel', sessionModel);
 
           this.zalogowanyUserEmail = result.model.email;
           this.isLoggedIn = true;
           this.logowanie = false;
-          this.role = result.model.role ? result.model.role : "";
+          this.role = result.model.role == null ? '' : result.model.role;
 
 
           
@@ -146,7 +143,6 @@ export class DashboardComponent implements OnInit {
         } else {
           this.snackBarService.setSnackBar(`${InfoService.info('Dashboard', 'login')}. ${result.message}.`);
           localStorage.removeItem('sessionModel');
-          //this.localStorageSessionService.removeItem('sessionModel');
           this.isLoggedIn = false;
           this.logowanie = false;
           form.reset();
@@ -154,9 +150,8 @@ export class DashboardComponent implements OnInit {
         return result;
       }),
       error: (error: Error) => {
-        this.snackBarService.setSnackBar(`Brak połączenia z bazą danych or token time expired. ${InfoService.info('Dashboard', 'login')}. Name: ${error.name}. Message: ${error.message}`);
+        this.snackBarService.setSnackBar(`Brak połączenia z bazą danych. ${InfoService.info('Dashboard', 'login')}. Name: ${error.name}. Message: ${error.message}`);
         localStorage.removeItem('sessionModel');
-        //this.localStorageSessionService.removeItem('sessionModel');
         this.logowanie = false;
       }
     });
